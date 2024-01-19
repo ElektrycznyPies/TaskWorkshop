@@ -50,6 +50,7 @@ public class TaskManager {
         try (Scanner scan = new Scanner(file)) {
             while (scan.hasNextLine()) {
                 tasksNumber++;              //finds number of lines (tasks) in file
+                scan.nextLine();
             }
         }   catch (FileNotFoundException ex) {
                 System.out.println("Problem z plikiem.");
@@ -63,14 +64,13 @@ public class TaskManager {
                     String taskLine = scan.nextLine();
                     String[] row = taskLine.split(", ");
                     tasks[i] = row;                     //loads tasks to array
-                    System.out.println(Arrays.toString(tasks[i]));
+                    System.out.println(i+1 + " : " + Arrays.toString(tasks[i]));
                 }
             }
         }   catch (FileNotFoundException ex) {
             System.out.println("Problem z plikiem.");
         }
-
-        }
     }
+}
 
 
