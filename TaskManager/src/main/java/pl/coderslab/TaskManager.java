@@ -22,7 +22,8 @@ public class TaskManager {
     //private static String [][] tasks;
     public static void main(String[] args) {
 
-        readTasks(1, -1); // list tasks, remove none
+
+        System.out.println("TASKS MANAGER\n=============");
 
         String[] optionsMenu = new String[]{"add", "remove", "list", "exit"}; //Makes Options Menu array
 
@@ -81,6 +82,29 @@ public class TaskManager {
                         System.out.println(i + 1 + " : " + Arrays.toString(tasks[i]));
                     }
                 }
+                if ((removing > -1) && (removing < tasks.length)) {        //if "remove" was selected, deletes specified line
+                    String[][] tempArr = new String[tasks.length-1][];
+                    for (int i = 0; i < tasks.length; i++) {
+                        if (i == removing) {
+                                        //do nothing for the row to be deleted
+                        } else {
+                            tempArr[i] = tasks[i];
+                            tasks = Arrays.copyOf(tempArr, tasks.length-1);
+
+                            try (FileWriter writer = new FileWriter(file, false)) {
+                                for (int j = 0; j< tasks[i].length; j++) {
+                                    writer.append(tasks[i][j]).append(", "); // purges file and fills with new array
+                                    if (j == tasks[i].length) { writer.append("\n"); }
+                                }
+                            } catch (IOException ex) {
+                                System.out.println("Problem z plikiem.");
+                            }
+                        }
+                    }
+                    break;
+                } else {
+                    break;
+                }
             }
         } catch (FileNotFoundException ex) {
             System.out.println("Problem z plikiem.");
@@ -113,15 +137,13 @@ public class TaskManager {
             System.out.println(taskDescription + "  " + taskImp);
             writer.append(taskDescription).append(", ").append(taskDate).append(", ").append(taskImp).append("\n"); //adds input as one row (one new task)
         } catch (IOException ex) {
-                System.out.println("problem z plikiem");
+                System.out.println("Problem z plikiem.");
             }
     }
 
     public static void removeTask() {
-        //int listing = 0;
-        //readTasks(listing);
-        int removeLnNo = 0;
 
+        int removeLnNo = 0;
 
         Scanner scan = new Scanner(System.in);              //user inputs new Task data
         while (true) {
@@ -133,21 +155,8 @@ public class TaskManager {
             } else if (removeLnStr.equals("exit")) {
                 break;
             } else {
-                removeLnNo = Integer.parseInt(removeLnStr);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                removeLnNo = Integer.parseInt(removeLnStr) - 1;
+                readTasks(0, removeLnNo);
                 break;
 
 
@@ -155,10 +164,6 @@ public class TaskManager {
 
             }
         }
-    }
-
-    public static void listTasks() {
-
     }
 }
 
