@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -18,39 +19,42 @@ import java.util.Scanner;
 
 public class TaskManager {
 
+    //private static String [][] tasks;
     public static void main(String[] args) {
 
-        int listing = 0;
-        readTasks(listing);
+        readTasks(1, -1); // list tasks, remove none
 
         String[] optionsMenu = new String[]{"add", "remove", "list", "exit"}; //Makes Options Menu array
 
         Scanner scan = new Scanner(System.in);
-        System.out.println("Please select an option: ");
 
         while (true) {                                          //unending loop, exits with break;
-
+            System.out.println("OPTIONS MENU:");
             for (int i = 0; i < optionsMenu.length; i++) {      //displays Options Menu from array
-                System.out.println(optionsMenu[i]);
+                System.out.print(optionsMenu[i] + "    ");
             }
-
+            System.out.println();
             String input = scan.nextLine();
 
             if (input.equals("exit")) {
+                System.out.println("Task Manager ENDS" + "\n" + "=================");
                 break;
             } else if (input.equals("list")) {
-                listing = 1; readTasks(listing);
+                System.out.println("LIST OF TASKS:");
+                readTasks(1, -1);       // list Tasks, remove none
             } else if (input.equals("add")) {
+                System.out.println("ADD A TASK:");
                 addTask();
             } else if (input.equals("remove")) {
+                System.out.println("REMOVE A TASK:");
                 removeTask();
             } else {
-                System.out.println("Unknown command, please select a valid option.");
+                System.out.println("   !unknown command");
             }
         }
     }
 
-    public static void readTasks(int listing) {
+    public static void readTasks(int listing, int removing) {
 
         int tasksNumber = 0;
 
@@ -72,7 +76,10 @@ public class TaskManager {
                     String taskLine = scan.nextLine();
                     String[] row = taskLine.split(", ");
                     tasks[i] = row;                     //loads tasks to array
-                    if (listing == 1) { System.out.println(i + 1 + " : " + Arrays.toString(tasks[i])); }
+
+                    if (listing == 1) {                 //if "list" was selected from Menu, displays tasks
+                        System.out.println(i + 1 + " : " + Arrays.toString(tasks[i]));
+                    }
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -82,8 +89,8 @@ public class TaskManager {
 
     public static void addTask() {
 
-        int listing = 0;
-        readTasks(listing);
+      /*  int listing = 0;
+        readTasks(listing); */
 
         Scanner scan = new Scanner(System.in);              //user inputs new Task data
         System.out.println("Enter task description: ");
@@ -97,7 +104,7 @@ public class TaskManager {
             if (taskImp.equals("true") || taskImp.equals("false")) {
                 break;
             } else {
-                System.out.println("Input only true or false");
+                System.out.println("   !input only true or false");
             }
         }
 
@@ -111,6 +118,43 @@ public class TaskManager {
     }
 
     public static void removeTask() {
+        //int listing = 0;
+        //readTasks(listing);
+        int removeLnNo = 0;
+
+
+        Scanner scan = new Scanner(System.in);              //user inputs new Task data
+        while (true) {
+            System.out.println("Select task number to remove or type exit to cancel:");
+            readTasks(1, -1);           //list tasks, remove none
+            String removeLnStr = scan.nextLine();
+            if (!NumberUtils.isParsable(removeLnStr) || removeLnStr.equals("exit")) {
+                System.out.println("   !enter a task number or exit only");
+            } else if (removeLnStr.equals("exit")) {
+                break;
+            } else {
+                removeLnNo = Integer.parseInt(removeLnStr);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                break;
+
+
+//                tasks[][] = ArrayUtils.remove(tasks, removeLnNo - 1);
+
+            }
+        }
     }
 
     public static void listTasks() {
