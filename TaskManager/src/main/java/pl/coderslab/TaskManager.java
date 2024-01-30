@@ -1,19 +1,9 @@
 package pl.coderslab;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.StringUtils;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 
@@ -42,8 +32,9 @@ public class TaskManager {
                 break;
             } else if (input.equals("list")) {
                 System.out.println("LIST OF TASKS:");
-                readTasks(1, -1);       // list Tasks, remove none
-            } else if (input.equals("add")) {
+                //listTasks();
+                readTasks(1);       // list Tasks, remove none
+                } else if (input.equals("add")) {
                 System.out.println("ADD A TASK:");
                 addTask();
             } else if (input.equals("remove")) {
@@ -55,10 +46,10 @@ public class TaskManager {
         }
     }
 
-    public static void readTasks(int listing, int removing) {
+    // === LOAD ARRAY (if argument 0) / LIST TASKS (if 1) ===
+    public static String[][] readTasks(int listing) {     //loads tasks into array and return array. If listing = 1: also print tasks
 
         int tasksNumber = 0;
-
         File file = new File("tasks.csv");
         try (Scanner scan = new Scanner(file)) {
             while (scan.hasNextLine()) {
@@ -78,91 +69,119 @@ public class TaskManager {
                     String[] row = taskLine.split(", ");
                     tasks[i] = row;                     //loads tasks to array
 
-                    if (listing == 1) {                 //if "list" was selected from Menu, displays tasks
-                        System.out.println(i + 1 + " : " + Arrays.toString(tasks[i]));
-                    }
-                }
-                if ((removing > -1) && (removing < tasks.length)) {        //if "remove" was selected, deletes specified line
-                    String[][] tempArr = new String[tasks.length-1][];
-                    for (int i = 0; i < tasks.length; i++) {
-                        if (i == removing) {
-                                        //do nothing for the row to be deleted
-                        } else {
-                            tempArr[i] = tasks[i];
-                            tasks = Arrays.copyOf(tempArr, tasks.length-1);
-
-                            try (FileWriter writer = new FileWriter(file, false)) {
-                                for (int j = 0; j< tasks[i].length; j++) {
-                                    writer.append(tasks[i][j]).append(", "); // purges file and fills with new array
-                                    if (j == tasks[i].length) { writer.append("\n"); }
+                    if (listing == 1) {
+                        for (int k = 0; k < tasks.length; k++) {
+                            System.out.print(k + " : ");
+                            for (int l = 0; l < tasks[k].length; l++) {
+                                System.out.print(tasks[k][l]);
+                                if (l < tasks[k].length - 1) {
+                                    System.out.print(", ");
                                 }
-                            } catch (IOException ex) {
-                                System.out.println("Problem z plikiem.");
                             }
+                            System.out.println();
                         }
+                        //System.out.println(i + 1 + " : " + Arrays.toString(tasks[i])); // list array of tasks //DOROBIĆ ŁADNE WYŚWIETLANIE
                     }
-                    break;
-                } else {
-                    break;
                 }
             }
-        } catch (FileNotFoundException ex) {
+        }  catch (FileNotFoundException ex) {
             System.out.println("Problem z plikiem.");
         }
+    return tasks;
     }
+
+//  === ADD TASK ===
 
     public static void addTask() {
 
-      /*  int listing = 0;
-        readTasks(listing); */
+        String[][] tempTasks = readTasks(0);
+        String[][] tasks = Arrays.copyOf(tempTasks, tempTasks.length + 1);
+        tasks[tasks.length - 1] = new String[tempTasks[0].length]; // it was needed to initialize the last row! Otherwise would not work...
+
+//        tasks[tasks.length - 1][0] = ""; tasks[tasks.length - 1][1] = ""; tasks[tasks.length - 1][2] = "";
 
         Scanner scan = new Scanner(System.in);              //user inputs new Task data
         System.out.println("Enter task description: ");
-        String taskDescription = scan.nextLine();
+        tasks[tasks.length - 1][0] = scan.nextLine();
         System.out.println("Enter due date: ");
-        String taskDate = scan.nextLine();
-        String taskImp = "";
+        tasks[tasks.length - 1][1] = scan.nextLine();
+
         while (true) {
             System.out.println("Is this task important? (true / false) ");
-            taskImp = scan.nextLine();
-            if (taskImp.equals("true") || taskImp.equals("false")) {
+            tasks[tasks.length - 1][2] = scan.nextLine();
+            if (tasks[tasks.length - 1][2].equals("true") || tasks[tasks.length - 1][2].equals("false")) {
                 break;
             } else {
                 System.out.println("   !input only true or false");
             }
         }
 
-        File file = new File("tasks.csv");      //new Task is written to csv file
-        try (FileWriter writer = new FileWriter(file, true)) {
-            System.out.println(taskDescription + "  " + taskImp);
-            writer.append(taskDescription).append(", ").append(taskDate).append(", ").append(taskImp).append("\n"); //adds input as one row (one new task)
-        } catch (IOException ex) {
-                System.out.println("Problem z plikiem.");
-            }
+        writeToFile(tasks);
+
     }
+
+
+    // === REMOVE TASK ===
 
     public static void removeTask() {
 
         int removeLnNo = 0;
-
         Scanner scan = new Scanner(System.in);              //user inputs new Task data
         while (true) {
             System.out.println("Select task number to remove or type exit to cancel:");
-            readTasks(1, -1);           //list tasks, remove none
+            readTasks(1);          //list tasks
             String removeLnStr = scan.nextLine();
-            if (!NumberUtils.isParsable(removeLnStr) || removeLnStr.equals("exit")) {
+            if (!NumberUtils.isParsable(removeLnStr) | removeLnStr.equals("exit")) {
                 System.out.println("   !enter a task number or exit only");
             } else if (removeLnStr.equals("exit")) {
                 break;
             } else {
                 removeLnNo = Integer.parseInt(removeLnStr) - 1;
-                readTasks(0, removeLnNo);
+                readTasks(0);
                 break;
-
-
-//                tasks[][] = ArrayUtils.remove(tasks, removeLnNo - 1);
-
             }
+        }
+
+        String[][] tasks = readTasks(0); // makes array fed with data from readTasks method
+        String[][] tasksRemoved = new String[tasks.length - 1][]; // makes temporary array 1 row less
+
+        int j = 0;
+        for (int i = 0; i < tasks.length; i++) {
+            if (i == removeLnNo) {
+                                        // ignores a row to be removed
+            } else {
+                tasksRemoved[j] = tasks[i];
+                j++;
+            }
+        }
+
+/*        for (String[] row : tasksRemoved) {
+            for (String element : row) {
+                System.out.print(element + " ");
+            }
+            System.out.println();  // Dodaj nową linię po każdym rzędzie
+        }
+*/
+        writeToFile(tasksRemoved);
+
+// === WRITE ARRAY TO FILE ===
+
+    }
+    public static void writeToFile(String[][] tasks) {
+        File file = new File("tasks.csv");
+        try (FileWriter writer = new FileWriter(file, false)) {
+
+            for (int i = 0; i < tasks.length; i++) {
+                for (int j = 0; j < tasks[i].length; j++) {
+                    writer.append(tasks[i][j]);
+                    if (j < tasks[i].length - 1) {
+                        writer.append(", ");
+                    }
+                }
+                writer.append("\n");
+            }
+        } catch (IOException ex) {
+            System.out.println("Problem z plikiem.");
         }
     }
 }
