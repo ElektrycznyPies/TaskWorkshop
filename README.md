@@ -1,2 +1,2 @@
 # Workshop 1
-Coders Lab Tasks program
+Coders Lab Tasks Manager program
